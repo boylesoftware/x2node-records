@@ -1,17 +1,27 @@
 /**
  * Record types library module.
- *
- * @module x2node-records
  */
 'use strict';
 
 /**
+ * Node.js <code>Error</code> object.
+ *
+ * @external Error
+ * @see {@link https://nodejs.org/dist/latest-v4.x/docs/api/errors.html#errors_class_error}
+ */
+
+/**
  * Invalid record type definition.
  *
- * @extends Error
+ * @extends external:Error
  */
 class RecordTypeError extends Error {
 
+	/**
+	 * Create new error.
+	 *
+	 * @param {string} message The error description.
+	 */
 	constructor(message) {
 		super();
 
@@ -22,8 +32,16 @@ class RecordTypeError extends Error {
 	}
 }
 
+/**
+ * Record types library.
+ */
 class RecordTypesLibrary {
 
+	/**
+	 * Create record types library.
+	 *
+	 * @param {Object} recordTypeDefs Record type definitions.
+	 */
 	constructor(recordTypeDefs) {
 
 		this._recordTypeDefs = recordTypeDefs;
@@ -31,6 +49,13 @@ class RecordTypesLibrary {
 		this._recordTypeDescs = {};
 	}
 
+	/**
+	 * Get descriptor for the specified record type.
+	 *
+	 * @param {string} recordTypeName Record type name.
+	 * @returns {RecordTypeDescriptor} Record type descriptor.
+	 * @throws {RecordTypeError} If no such record type in the library.
+	 */
 	getRecordTypeDesc(recordTypeName) {
 
 		const recordTypeDesc = this._recordTypeDescs[recordTypeName];
@@ -46,14 +71,37 @@ class RecordTypesLibrary {
 			this, recordTypeName, recordTypeDef));
 	}
 
+	/**
+	 * Tell if the library has the specified record type.
+	 *
+	 * @param {string} recordTypeName Record type name.
+	 * @returns {boolean} <code>true</code> if there is such type.
+	 */
 	hasRecordType(recordTypeName) {
 
 		return (this._recordTypeDefs[recordTypeName] !== undefined);
 	}
 }
 
+/**
+ * Descriptor of an entity that has properties, such as record type or a nested
+ * object property.
+ */
 class PropertiesContainer {
 
+	/**
+	 * Create new container descriptor. The constructor is never called directly
+	 * by the client code.
+	 *
+	 * @param {RecordTypesLibrary} recordTypes The record types library.
+	 * @param {string} recordTypeName Name of the record type, to which the
+	 * container belongs (name of the record type if the container <em>is</em>
+	 * itself the record type).
+	 * @param {string} nestedPath Dot-separated path to the property represented
+	 * by the container, or empty string if the container is the record type
+	 * descriptor.
+	 * @param {Object} propertyDefs Definitions of the contained properties.
+	 */
 	constructor(recordTypes, recordTypeName, nestedPath, propertyDefs) {
 
 		this._recordTypes = recordTypes;
@@ -67,6 +115,13 @@ class PropertiesContainer {
 		this._propertyDescs = {};
 	}
 
+	/**
+	 * Get specified property descriptor.
+	 *
+	 * @param {string} propName Property name.
+	 * @returns {PropertyDescriptor} The property descriptor.
+	 * @throws {RecordTypeError} If no such property in the container.
+	 */
 	getPropertyDesc(propName) {
 
 		const propDesc = this._propertyDescs[propName];
@@ -84,20 +139,60 @@ class PropertiesContainer {
 			this._recordTypes, this, propName, propDef));
 	}
 
+	/**
+	 * Tell if the container contains the specified property.
+	 *
+	 * @param {string} propName Property name.
+	 * @returns {boolean} <code>true</code> if there is such property.
+	 */
 	hasProperty(propName) {
 
 		return (this._propertyDefs[propName] !== undefined);
 	}
 
+	/**
+	 * Name of the record type, to which the container belongs (name of the
+	 * record type if the container <em>is</em> itself the record type).
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get recordTypeName() { return this._recordTypeName; }
 
+	/**
+	 * Dot-separated path to the property represented by the container within the
+	 * record type, or empty string if the container is the record type.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get nestedPath() { return this._nestedPath; }
 
+	/**
+	 * Name of the id property in the container, or <code>undefined</code> if no
+	 * id property.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get idPropertyName() { return this._idPropName; }
 }
 
+/**
+ * Record type descriptor.
+ *
+ * @extends PropertiesContainer
+ */
 class RecordTypeDescriptor extends PropertiesContainer {
 
+	/**
+	 * Create new record type descriptor. The constructor is never called
+	 * directly by the client code.
+	 *
+	 * @param {RecordTypesLibrary} recordTypes The record types library.
+	 * @param {string} recordTypeName Record type name.
+	 * @param {Object} recordTypeDef Record type definition.
+	 */
 	constructor(recordTypes, recordTypeName, recordTypeDef) {
 		super(recordTypes, recordTypeName, '', recordTypeDef.properties);
 
@@ -114,10 +209,27 @@ class RecordTypeDescriptor extends PropertiesContainer {
 			});
 	}
 
+	/**
+	 * Record type name.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get name() { return this.recordTypeName; }
 
+	/**
+	 * Record type definition.
+	 *
+	 * @type {Object}
+	 * @readonly
+	 */
 	get definition() { return this._definition; }
 
+	/**
+	 * Create new record of this type.
+	 *
+	 * @returns {Object} The new record instance.
+	 */
 	newRecord() {
 
 		return this._factory.call(this._definition);
@@ -134,8 +246,21 @@ const VALUE_TYPE_RE = new RegExp(
 	')\\s*$'
 );
 
+/**
+ * Record property descriptor.
+ */
 class PropertyDescriptor {
 
+	/**
+	 * Create new property descriptor. The constructor is never called directly
+	 * by the client code.
+	 *
+	 * @param {RecordTypesLibrary} recordTypes The record types library.
+	 * @param {PropertiesContainer} container The container, to which the
+	 * property belongs.
+	 * @param {string} propName Property name.
+	 * @param {Object} propDef Property definition.
+	 */
 	constructor(recordTypes, container, propName, propDef) {
 
 		this._name = propName;
@@ -230,30 +355,120 @@ class PropertyDescriptor {
 		}
 	}
 
+	/**
+	 * Property name.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get name() { return this._name; }
 
+	/**
+	 * Property definition.
+	 *
+	 * @type {Object}
+	 * @readonly
+	 */
 	get definition() { return this._definition; }
 
+	/**
+	 * Scalar value type of the property. One of "string", "number", "boolean",
+	 * "datetime", "object" or "ref".
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get scalarValueType() { return this._scalarValueType; }
 
+	/**
+	 * <code>true</code> if the property is scalar.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isScalar() { return this._isScalar; }
 
+	/**
+	 * <code>true</code> if the property is an array.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isArray() { return this._isArray; }
 
+	/**
+	 * <code>true</code> if the property is a map.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isMap() { return this._isMap; }
 
+	/**
+	 * <code>true</code> if the property is polymorphic (either nested object or
+	 * reference).
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isPolymorph() { return this._isPolymorph; }
 
+	/**
+	 * <code>true</code> if the property is a record or nested object instance
+	 * id.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isId() { return this._isId; }
 
+	/**
+	 * <code>true</code> if the property is a reference
+	 * (<code>scalarValueType</code> is "ref").
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
 	isRef() { return (this._scalarValueType === 'ref'); }
 
+	/**
+	 * Name of the target record type for a reference property.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
 	get refTarget() { return this._refTargets[0]; }
 
+	/**
+	 * For a polymorphic reference property, names of all possible target record
+	 * types.
+	 *
+	 * @type {string[]}
+	 * @readonly
+	 */
 	get refTargets() { return this._refTargets; }
 
+	/**
+	 * For a nested object property (<code>scalarValueType</code> is "object"),
+	 * the descriptors of the nested properties.
+	 *
+	 * @type {PropertiesContainer}
+	 * @readonly
+	 */
 	get nestedProperties() { return this._nestedProperties; }
 
+	/**
+	 * Create new nested object instance for a nested object property.
+	 *
+	 * @returns {Object} New nested object instance.
+	 */
+	/**
+	 * Create new nested object instance for a polymorphic nested object
+	 * property.
+	 *
+	 * @param {string} subtypeName Concrete subtype name.
+	 * @returns {Object} New nested object instance of the specified subtype.
+	 */
 	newObject(subtypeName) {
 
 		if (this._isPolymorph) {
