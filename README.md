@@ -17,7 +17,7 @@ const recordTypes = new RecordTypesLibrary({
 			'name': {
 				valueType: 'string'
 			},
-			'orderRefs: {
+			'orderRefs': {
 				valueType: '[ref(Order)]'
 			}
 		}
