@@ -1,5 +1,13 @@
 /**
- * Record types library module.
+ * Record types library module. The module exports the
+ * [RecordTypesLibrary]{@link module:x2node-records~RecordTypesLibrary} class.
+ *
+ * @example
+ * const RecordTypesLibrary = require('x2node-records');
+ *
+ * const recordTypes = new RecordTypesLibrary(...);
+ *
+ * @module x2node-records
  */
 'use strict';
 
@@ -18,7 +26,7 @@
 class RecordTypeError extends Error {
 
 	/**
-	 * Create new error.
+	 * <b>The constructor is not accessible from the client code.</b>
 	 *
 	 * @param {string} message The error description.
 	 */
@@ -53,8 +61,10 @@ class RecordTypesLibrary {
 	 * Get descriptor for the specified record type.
 	 *
 	 * @param {string} recordTypeName Record type name.
-	 * @returns {RecordTypeDescriptor} Record type descriptor.
-	 * @throws {RecordTypeError} If no such record type in the library.
+	 * @returns {module:x2node-records~RecordTypeDescriptor} Record type
+	 * descriptor.
+	 * @throws {module:x2node-records~RecordTypeError} If no such record type in
+	 * the library.
 	 */
 	getRecordTypeDesc(recordTypeName) {
 
@@ -90,10 +100,10 @@ class RecordTypesLibrary {
 class PropertiesContainer {
 
 	/**
-	 * Create new container descriptor. The constructor is never called directly
-	 * by the client code.
+	 * <b>The constructor is not accessible from the client code.</b>
 	 *
-	 * @param {RecordTypesLibrary} recordTypes The record types library.
+	 * @param {module:x2node-records~RecordTypesLibrary} recordTypes The record
+	 * types library.
 	 * @param {string} recordTypeName Name of the record type, to which the
 	 * container belongs (name of the record type if the container <em>is</em>
 	 * itself the record type).
@@ -119,8 +129,10 @@ class PropertiesContainer {
 	 * Get specified property descriptor.
 	 *
 	 * @param {string} propName Property name.
-	 * @returns {PropertyDescriptor} The property descriptor.
-	 * @throws {RecordTypeError} If no such property in the container.
+	 * @returns {module:x2node-records~PropertyDescriptor} The property
+	 * descriptor.
+	 * @throws {module:x2node-records~RecordTypeError} If no such property in the
+	 * container.
 	 */
 	getPropertyDesc(propName) {
 
@@ -181,15 +193,15 @@ class PropertiesContainer {
 /**
  * Record type descriptor.
  *
- * @extends PropertiesContainer
+ * @extends module:x2node-records~PropertiesContainer
  */
 class RecordTypeDescriptor extends PropertiesContainer {
 
 	/**
-	 * Create new record type descriptor. The constructor is never called
-	 * directly by the client code.
+	 * <b>The constructor is not accessible from the client code.</b>
 	 *
-	 * @param {RecordTypesLibrary} recordTypes The record types library.
+	 * @param {module:x2node-records~RecordTypesLibrary} recordTypes The record
+	 * types library.
 	 * @param {string} recordTypeName Record type name.
 	 * @param {Object} recordTypeDef Record type definition.
 	 */
@@ -252,12 +264,12 @@ const VALUE_TYPE_RE = new RegExp(
 class PropertyDescriptor {
 
 	/**
-	 * Create new property descriptor. The constructor is never called directly
-	 * by the client code.
+	 * <b>The constructor is not accessible from the client code.</b>
 	 *
-	 * @param {RecordTypesLibrary} recordTypes The record types library.
-	 * @param {PropertiesContainer} container The container, to which the
-	 * property belongs.
+	 * @param {module:x2node-records~RecordTypesLibrary} recordTypes The record
+	 * types library.
+	 * @param {module:x2node-records~PropertiesContainer} container The
+	 * container, to which the property belongs.
 	 * @param {string} propName Property name.
 	 * @param {Object} propDef Property definition.
 	 */
@@ -452,7 +464,7 @@ class PropertyDescriptor {
 	 * For a nested object property (<code>scalarValueType</code> is "object"),
 	 * the descriptors of the nested properties.
 	 *
-	 * @type {PropertiesContainer}
+	 * @type {module:x2node-records~PropertiesContainer}
 	 * @readonly
 	 */
 	get nestedProperties() { return this._nestedProperties; }
@@ -461,8 +473,7 @@ class PropertyDescriptor {
 	 * Create new nested object instance for a nested object property.
 	 *
 	 * @returns {Object} New nested object instance.
-	 */
-	/**
+	 *//**
 	 * Create new nested object instance for a polymorphic nested object
 	 * property.
 	 *
