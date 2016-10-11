@@ -99,10 +99,8 @@ Then a record of type `Person` could be:
 
 ```json
 {
-  ...
   "firstName": "Billy",
-  "lastName": "Bones",
-  ...
+  "lastName": "Bones"
 }
 ```
 
@@ -133,10 +131,8 @@ And in a record:
 
 ```json
 {
-  ...
   "worth": 250000.00,
-  "numShipsServed": 5,
-  ...
+  "numShipsServed": 5
 }
 ```
 
@@ -164,9 +160,7 @@ And in a record:
 
 ```json
 {
-  ...
-  "available": true,
-  ...
+  "available": true
 }
 ```
 
@@ -194,9 +188,7 @@ Then in a record it can be:
 
 ```json
 {
-  ...
-  "boardedOn": "1765-10-05T14:48:00.000Z",
-  ...
+  "boardedOn": "1765-10-05T14:48:00.000Z"
 }
 ```
 
@@ -224,8 +216,7 @@ So, a record could look like:
 
 ```json
 {
-  "id": 35066,
-  ...
+  "id": 35066
 }
 ```
 
@@ -267,14 +258,12 @@ Then in a record it could be:
 
 ```json
 {
-  ...
   "address": {
     "street": "42 W 24th St.",
 	"city": "New York",
 	"state": "NY",
 	"zip": "10010"
-  },
-  ...
+  }
 }
 ```
 
@@ -329,13 +318,11 @@ Given the example definition above, an account record with a credit card payment
 
 ```json
 {
-  ...
   "paymentInfo": {
     "type": "CREDIT_CARD",
 	"last4Digits": "3005",
 	"expDate": "2020-04"
-  },
-  ...
+  }
 }
 ```
 
@@ -343,13 +330,11 @@ And a record with an ACH transfer payment info:
 
 ```json
 {
-  ...
   "paymentInfo": {
     "type": "ACH_TRANSFER",
 	"accountType": "CHECKING",
 	"last4Digits": "8845"
-  },
-  ...
+  }
 }
 ```
 
@@ -391,9 +376,7 @@ Then an Order record could be:
 ```json
 {
   "id": 123,
-  ...
   "productRef": "Product#255"
-  ...
 }
 ```
 
@@ -467,8 +450,7 @@ Then a record could look like:
 
 ```json
 {
-  ...
-  "scores": [ 3, 5.6, 10, -1, 0 ],
+  "scores": [ 3, 5.6, 10, -1, 0 ]
   "phones": [
     {
 	  "id": 1,
@@ -482,7 +464,6 @@ Then a record could look like:
 	}
   ],
   "orders": [ "Order#25684", "Order#25722" ]
-  ...
 }
 ```
 
@@ -512,13 +493,11 @@ So, a student record could look like:
 
 ```json
 {
-  ...
   "scores": {
     "MATH101": 3.6,
 	"BIO201": 5.0,
 	"ENGLISH120": 4.8
-  },
-  ...
+  }
 }
 ```
 
