@@ -450,7 +450,7 @@ Then a record could look like:
 
 ```json
 {
-  "scores": [ 3, 5.6, 10, -1, 0 ]
+  "scores": [ 3, 5.6, 10, -1, 0 ],
   "phones": [
     {
 	  "id": 1,
