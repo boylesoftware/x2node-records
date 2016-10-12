@@ -1,7 +1,5 @@
 # X2 Framework for Node.js | Record Types Library
 
-This module provides application with tools for defining the data structures, with which they operate. The module is a part of X2 Framework.
-
 X2 Framework deals with the notion of *records*. Records are objects of a certain type, normally persisted in a database and identified by a unique id. In the code, records are represented by JSON objects. The collection of *record types* assembled into a *record types library* defines the data domain, with which the application operates. Record types define the structure of the records, record properties and their types, etc. A record type definition is a schema for the records, or, using the OOP analogy, record types are like classes and records are like instances or objects of those classes.
 
 ## Table of Contents
