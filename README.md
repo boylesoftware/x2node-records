@@ -2,6 +2,30 @@
 
 X2 Framework deals with the notion of *records*. Records are objects of a certain type, normally persisted in a database and identified by a unique id. In the code, records are represented by JSON objects. The collection of *record types* assembled into a *record types library* defines the data domain, with which the application operates. Record types define the structure of the records, record properties and their types, etc. A record type definition is a schema for the records, or, using the OOP concept, record types are like classes and records are like instances or objects of those classes.
 
+## Table of Contents
+
+* [Usage](#usage)
+* [Record Type Definitions](#record-type-definitions)
+  * [Simple Value Types](#simple-value-types)
+    * [The "string" Value Type](#the-string-value-type)
+	* [The "number" Value Type](#the-number-value-type)
+	* [The "boolean" Value Type](#the-boolean-value-type)
+	* [The "datetime" Value Type](#the-datetime-value-type)
+  * [Record Id Property](#record-id-property)
+  * [Nested Objects](#nested-objects)
+  * [Polymorphic Nested Objects](#polymorphic-nested-objects)
+  * [References](#references)
+  * [Arrays](#arrays)
+  * [Maps](#maps)
+* [The Descriptors](#the-descriptors)
+  * [RecordTypesLibrary Class](#recordtypeslibrary-class)
+  * [PropertiesContainer Class](#propertiescontainer-class)
+  * [RecordTypeDescriptor Class](#recordtypedescriptor-class)
+  * [PropertyDescriptor Class](#propertydescriptor-class)
+* [Extensibility](#extensibility)
+
+## Usage
+
 The `x2node-records` module provides the essentials for the application record types library. The library is represented by an instance of `RecordTypesLibrary` class exported by the module. A single library instance is usually created by the application once and then used throughout the runtime. When the library is created, it is provided with the *record type definitions* JSON object. For example:
 
 ```javascript
