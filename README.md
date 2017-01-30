@@ -26,12 +26,12 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
 
 ## Usage
 
-The `x2node-records` module provides the essentials for the application record types library. The library is represented by an instance of `RecordTypesLibrary` class exported by the module. A single library instance is usually created by the application once and then used throughout the runtime. When the library is created, it is provided with the *record type definitions* JSON object. For example:
+The `x2node-records` module provides the essentials for the application record types library. The library is represented by an instance of `RecordTypesLibrary` class that can be created using `createRecordTypesLibrary` function exported by the module. A single library instance is usually created by the application once and then used throughout the runtime. When the library is created, it is provided with the *record type definitions* JSON object. For example:
 
 ```javascript
-const RecordTypesLibrary = require('x2node-records');
+const records = require('x2node-records');
 
-const recordTypes = new RecordTypesLibrary({
+const recordTypes = records.createRecordTypesLibrary({
 	'Account': {
 		properties: {
 			'id': {
@@ -514,7 +514,7 @@ Then a record could look like:
 }
 ```
 
-Note, that there is one requirement for nested object arrays: the nested objects *must* have an id property.
+Note, that there is one requirement for nested object arrays: the nested objects *must* have an id property. On the other hand, scalar nested objects *may not* have an id property (their id is the parent record id).
 
 ### Maps
 
@@ -548,19 +548,46 @@ So, a student record could look like:
 }
 ```
 
-Note, that for nested object maps there is no requirement for the nested objects to have an id property since the objects are uniquely identified by the map key.
+Note, that for nested object maps there is no requirement for the nested objects to have an id property since the objects are uniquely identified by the map key. On the other hand, a nested object or a reference map property definition may include a `keyProperty` property that names the property of the nested object or the referred record type that acts as the map key. The key property must be scalar. It may not be a nested object property and if it is a reference property it may not be polymorphic. For example:
+
+```javascript
+{
+	...
+	'Student': {
+		properties: {
+			...
+			'scores': {
+				valueType: '{object}',
+				keyProperty: 'courseCode',
+				properties: {
+					'courseCode': {
+						valueType: 'string'
+					},
+					'score': {
+						valueType: 'number'
+					}
+				}
+			},
+			...
+		}
+	},
+	...
+}
+```
 
 ## The Descriptors
 
-The `RecordTypesLibrary` class provides an API for working with the record types. The API converts the record type and property *definitions* provided to the library constructor to the corresponding record type and property *descriptors*, which are API objects providing properties and methods for the clients. The original definition object is always available through the descriptor.
+The `RecordTypesLibrary` class provides an API for working with the record types. The API converts the record type and property *definitions* provided to the module's `createRecordTypesLibrary` function to the corresponding record type and property *descriptors*, which are API objects providing properties and methods for the clients. The original definition object is always available through the descriptor.
 
 ### RecordTypesLibrary Class
 
-This is the top class representing the whole record types library. This is the class exported by the module and its constructor takes the record type definitions object. The following methods are exposed:
+This is the top class representing the whole record types library. The following methods are exposed:
 
-* `getRecordTypeDesc(recordTypeName)` - Get record type descriptor from the library. The argument is a string that specifies the type name. The returned object is an instance of `RecordTypeDescriptor`. If no specified record type exists, a `RecordTypeError` is thrown.
+* `getRecordTypeDesc(recordTypeName)` - Get record type descriptor from the library. The argument is a string (or `Symbol`) that specifies the type name. The returned object is an instance of `RecordTypeDescriptor`. If no specified record type exists, a `X2UsageError` is thrown.
 
 * `hasRecordType(recordTypeName)` - Tell if the specified record type exists. Returns a Boolean `true` or `false`.
+
+* `addRecordType(recordTypeName, recordTypeDef)` - Add record type to the library. Adding a record type via this method does not modify the original type definitions object used to create the library. Using a `Symbol` as the type name allows other modules to extend the types library in a non-collisional way.
 
 ### PropertiesContainer Class
 
@@ -568,13 +595,15 @@ Objects of this class describe anything that contains propeties. It matches the 
 
 A `PropertiesContainer` instance exposes the following properties and methods:
 
-* `recordTypeName` - Read-only string property that provides the name of the record type, to which the container belongs. If the container is the record type descriptor itself, this is the record type name. If the container describes a nested object property, this is the name of the record type, to which the property belongs.
+* `recordTypeName` - Read-only string (or `Symbol`) property that provides the name of the record type, to which the container belongs. If the container is the record type descriptor itself, this is the record type name. If the container describes a nested object property, this is the name of the record type, to which the property belongs.
 
-* `nestedPath` - Read-only string property that provides dot-separated path to the nested object property represented by the container. If the container is a record type descriptor, this property contains an empty string.
+* `nestedPath` - Read-only string property that provides dot-separated path to the nested object property represented by the container. The path, if present, always ends with a dot. If the container is a record type descriptor, this property contains an empty string. Path to a property of a polymoprhic nested object includes the subtype name as a path element.
 
 * `idPropertyName` - Read-only string property that provides the name of the id property in the container. If the container has no id property, the value is `undefined`.
 
-* `getPropertyDesc(propName)` - Get descriptor of the specified property. The `propName` parameter is a string that specifies the property name (no nested paths are supported). The method returns a `PropertyDescriptor` object. If no such property, `RecordTypeError` is thrown.
+* `allPropertyNames` - Read-only string array that contains names of all properties in the container.
+
+* `getPropertyDesc(propName)` - Get descriptor of the specified property. The `propName` parameter is a string that specifies the property name (no nested paths are supported). The method returns a `PropertyDescriptor` object. If no such property an `X2UsageError` is thrown.
 
 * `hasProperty(propName)` - Returns a Boolean `true` or `false` telling if the specified property exists.
 
@@ -582,7 +611,7 @@ A `PropertiesContainer` instance exposes the following properties and methods:
 
 The `RecordTypeDescriptor` extends the `PropertiesContainer` class and provides the top descriptor of a record type. In addition to the properties and methods exposed by `PropertiesContainer`, the class also exposes the following properties and methods:
 
-* `name` - Read-only string with the record type name. This is the same as what's exposed by the `PropertyContainer`'s `recordTypeName` property.
+* `name` - Read-only string (or `Symbol`) with the record type name. This is the same as what's exposed by the `PropertyContainer`'s `recordTypeName` property.
 
 * `definition` - Read-only property that exposes the original record type definition object passed to the library constructor.
 
@@ -594,15 +623,19 @@ This is the "leaf" descriptor object representing an individual record property.
 
 * `name` - Read-only property name string.
 
+* `container` - Read-only reference to the `PropertiesContainer`, to which the property belongs.
+
 * `definition` - Read-only original property definition object.
 
-* `scalarValurType` - Read-only string property that describes the property value type. For a scalar property this is the type of the property value itself. For an array or map property, this is the type of the array or map elements. The following values are possible: "string", "number", "boolean", "datetime", "object" or "ref".
+* `scalarValueType` - Read-only string property that describes the property value type. For a scalar property this is the type of the property value itself. For an array or map property, this is the type of the array or map elements. The following values are possible: "string", "number", "boolean", "datetime", "object" or "ref".
 
 * `isScalar()` - Method that returns Boolean `true` if the property is scalar.
 
 * `isArray()` - Method that returns Boolean `true` if the property is an array.
 
 * `isMap()` - Method that returns Boolean `true` if the property is a map.
+
+* `keyPropertyName` - Read-only string property that for a nested object or reference map property contains the name of the property in the nested object or the referred record type that acts as the map key.
 
 * `isPolymorph()` - Method that returns Boolean `true` if the property is a polymorphic nested object or a reference with multiple allowed target record types.
 
@@ -614,7 +647,7 @@ This is the "leaf" descriptor object representing an individual record property.
 
 * `refTargets` - Read-only string array property containing the names of allowed target record types for a polymorphic reference property.
 
-* `nestedProperties` - For a nested object property, read-only `PropertiesContainer` property that describes properties of the nested object.
+* `nestedProperties` - For a nested object property, read-only `PropertiesContainer` property that describes properties of the nested object. If the object is polymorphic, the property is an object with keys being the subtype names and the values being the corresponding `PropertiesContainer` objects.
 
 * `newObject()` - Method used to create instances of the nested object for a nested object property.
 

@@ -16,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/boylesoftware/x2node-records/issues"
   },
-  "homepage": "https://github.com/boylesoftware/x2node-records#readme"
+  "homepage": "https://github.com/boylesoftware/x2node-records#readme",
+  "dependencies": {
+    "x2node-common": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=4.3.2"
+  }
 }
