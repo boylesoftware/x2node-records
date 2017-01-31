@@ -518,7 +518,7 @@ Note, that there is one requirement for nested object arrays: the nested objects
 
 ### Maps
 
-Another type of collection properties are maps. In the records, maps are represented as nested objects. The difference between a nested object property and a map property is that a map does not have a fixed nested property definitions. To define a map property, the property value type is enclosed in curly braces. For example:
+Another type of collection properties are maps. In the records, maps are represented as nested objects. The difference between a nested object property and a map property is that a map does not have a fixed nested property definitions. To define a map property, the property value type is enclosed in curly braces and a `keyValueType` property is added to specify the map key value type. For example:
 
 ```javascript
 {
@@ -527,7 +527,8 @@ Another type of collection properties are maps. In the records, maps are represe
 		properties: {
 			...
 			'scores': {
-				valueType: '{number}'
+				valueType: '{number}',
+				keyValueType: 'string'
 			},
 			...
 		}
@@ -548,7 +549,11 @@ So, a student record could look like:
 }
 ```
 
-Note, that for nested object maps there is no requirement for the nested objects to have an id property since the objects are uniquely identified by the map key. On the other hand, a nested object or a reference map property definition may include a `keyProperty` property that names the property of the nested object or the referred record type that acts as the map key. The key property must be scalar. It may not be a nested object property and if it is a reference property it may not be polymorphic. For example:
+The `keyValueType` may be `string`, `number`, `boolean`, `datetime` or a single target record type reference (for example `ref(Course)`). Regardless of the specified key value type, the key value is always used as a string.
+
+Note, that for nested object maps, unlike nested object arrays, there is no requirement for the nested objects to have an id property since the objects are uniquely identified by the map key.
+
+Also, for nested object and reference maps, instead of using `keyValueType` definition property, the definition may include a `keyPropertyName` property that names the property of the nested object or the referred record type that acts as the map key. As with the `keyValueType`, the key property must be scalar, it may not be a nested object, and if it is a reference property it may not be polymorphic. For example:
 
 ```javascript
 {
@@ -558,7 +563,7 @@ Note, that for nested object maps there is no requirement for the nested objects
 			...
 			'scores': {
 				valueType: '{object}',
-				keyProperty: 'courseCode',
+				keyPropertyName: 'courseCode',
 				properties: {
 					'courseCode': {
 						valueType: 'string'
@@ -634,6 +639,10 @@ This is the "leaf" descriptor object representing an individual record property.
 * `isArray()` - Method that returns Boolean `true` if the property is an array.
 
 * `isMap()` - Method that returns Boolean `true` if the property is a map.
+
+* `keyValueType` - Read-only string property that for a map property provides scalar value type of the map keys. May be "string", "number", "boolean", "datetime" or "ref".
+
+* `keyRefTarget` - Read-only string property that provides the target record type name if the `keyValueType` is a reference.
 
 * `keyPropertyName` - Read-only string property that for a nested object or reference map property contains the name of the property in the nested object or the referred record type that acts as the map key.
 

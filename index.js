@@ -25,15 +25,16 @@ class RecordTypesLibrary {
 	 */
 	constructor(recordTypeDefs) {
 
-		this._postCreationValidators = new Array();
+		this._finalizers = new Array();
 		this._recordTypeDescs = {};
 		for (let recordTypeName in recordTypeDefs)
 			this._recordTypeDescs[recordTypeName] = new RecordTypeDescriptor(
 				this, recordTypeName, recordTypeDefs[recordTypeName]);
 
-		this._postCreationValidators.forEach(validator => {
-			validator.call(this);
+		this._finalizers.forEach(finalizer => {
+			finalizer.call(this);
 		});
+		delete this._finalizers;
 	}
 
 	/**
@@ -84,13 +85,14 @@ class RecordTypesLibrary {
 			throw new common.X2UsageError(
 				'Record type ' + String(recordTypeName) + ' already exists.');
 
-		this._postCreationValidators = new Array();
+		this._finalizers = new Array();
 		this._recordTypeDescs[recordTypeName] = new RecordTypeDescriptor(
 			this, recordTypeName, recordTypeDef);
 
-		this._postCreationValidators.forEach(validator => {
-			validator.call(this);
+		this._finalizers.forEach(finalizer => {
+			finalizer.call(this);
 		});
+		delete this._finalizers;
 	}
 }
 
@@ -279,6 +281,8 @@ const VALUE_TYPE_RE = new RegExp(
 		'|\\{\\s*(?:' + SCALAR_VALUE_TYPE_PATTERN + ')\\s*\\}' +
 	')\\s*$'
 );
+const KEY_VALUE_TYPE_RE = new RegExp(
+	'^(string|number|boolean|datetime)|(ref)\\(\\s*([^|\\s]+)\\s*\\)$');
 
 /**
  * Record property descriptor.
@@ -340,9 +344,45 @@ class PropertyDescriptor {
 					' is an id property and can only be a scalar string or a' +
 					' number.');
 
-		// get the map key property
-		if (this._isMap)
-			this._keyPropertyName = propDef.keyProperty;
+		// get the map key value type or property
+		if (this._isMap) {
+			if (propDef.keyPropertyName) {
+				if ((this._scalarValueType !== 'ref') &&
+					(this._scalarValueType !== 'object'))
+					throw new common.X2UsageError(
+						'Record type ' + String(container.recordTypeName) +
+							' map property ' + container.nestedPath + propName +
+							' may not have keyPropertyName property because' +
+							' the map values are neither nested objects nor' +
+							' references.');
+				if (propDef.keyValueType)
+					throw new common.X2UsageError(
+						'Record type ' + String(container.recordTypeName) +
+							' map property ' + container.nestedPath + propName +
+							' may not have both keyValueType and' +
+							' keyPropertyName properties.');
+				this._keyPropertyName = propDef.keyPropertyName;
+			} else if (propDef.keyValueType) {
+				const m = KEY_VALUE_TYPE_RE.exec(propDef.keyValueType);
+				if (m === null)
+					throw new common.X2UsageError(
+						'Record type ' + String(container.recordTypeName) +
+							' map property ' + container.nestedPath + propName +
+							' has invalid keyValueType property.');
+				if (m[1]) {
+					this._keyValueType = m[1];
+				} else {
+					this._keyValueType = m[2];
+					this._keyRefTarget = m[3];
+				}
+			} else {
+				throw new common.X2UsageError(
+					'Record type ' + String(container.recordTypeName) +
+						' map property ' + container.nestedPath + propName +
+						' must specify either keyValueType or' +
+						' keyPropertyName property.');
+			}
+		}
 
 		// process reference and object properties
 		if (this._scalarValueType === 'ref') {
@@ -351,7 +391,7 @@ class PropertyDescriptor {
 			match = /\((.+)\)/.exec(propDef.valueType);
 			this._refTargets = match[1].trim().split(/\s*\|\s*/);
 			this._refTargets.forEach(refRecordTypeName => {
-				recordTypes._postCreationValidators.push(function() {
+				recordTypes._finalizers.push(function() {
 					if (!recordTypes.hasRecordType(refRecordTypeName))
 						throw new common.X2UsageError(
 							'Record type ' + String(container.recordTypeName) +
@@ -364,37 +404,13 @@ class PropertyDescriptor {
 			// determine if polymorphic
 			this._isPolymorph = (this._refTargets.length > 1);
 
-			// validate key property for a map
+			// process map key property if any
 			if (this._isMap && this._keyPropertyName) {
-				const keyPropName = this._keyPropertyName;
-				this._refTargets.forEach(refRecordTypeName => {
-					recordTypes._postCreationValidators.push(function() {
-						const refRecordType = recordTypes.getRecordTypeDesc(
-							refRecordTypeName);
-						if (!refRecordType.hasProperty(keyPropName))
-							throw new common.X2UsageError(
-								'Record type ' +
-									String(container.recordTypeName) +
-									' reference map property ' +
-									container.nestedPath +
-									propName + ' declares key property ' +
-									keyPropName + ' that does not exist in the' +
-									' target record type ' + refRecordTypeName +
-									'.');
-						const keyPropDesc = refRecordType.getPropertyDesc(
-							keyPropName);
-						if (!keyPropDesc.isScalar() ||
-							keyPropDesc.isPolymorph() ||
-							(keyPropDesc.scalarValueType === 'object'))
-							throw new common.X2UsageError(
-								'Record type ' +
-									String(container.recordTypeName) +
-									' reference map property ' +
-									container.nestedPath +
-									propName + ' declares key property ' +
-									keyPropName + ' in the target record type ' +
-									refRecordTypeName + ' that is not scalar,' +
-									' is a nested object, or is polymoprhic.');
+				const mapPropDesc = this;
+				recordTypes._finalizers.push(function() {
+					mapPropDesc._refTargets.forEach(refRecordTypeName => {
+						mapPropDesc._processKeyProperty(
+							recordTypes.getRecordTypeDesc(refRecordTypeName));
 					});
 				});
 			}
@@ -411,10 +427,14 @@ class PropertyDescriptor {
 					const subtypeDef = propDef.subtypes[subtypeName];
 
 					// create nested properties container
-					this._nestedProperties[subtypeName] =
-						this._createObjectNestedProperties(
-							recordTypes, container, propName + '.' + subtypeName,
-							subtypeDef);
+					const nestedProps = this._createObjectNestedProperties(
+						recordTypes, container, propName + '.' + subtypeName,
+						subtypeDef);
+					this._nestedProperties[subtypeName] = nestedProps;
+
+					// process map key property if any
+					if (this._isMap && this._keyPropertyName)
+						this._processKeyProperty(nestedProps);
 
 					// create object factory
 					this._factories[subtypeName] =
@@ -426,16 +446,26 @@ class PropertyDescriptor {
 				this._nestedProperties = this._createObjectNestedProperties(
 					recordTypes, container, propName, propDef);
 
+				// process map key property if any
+				if (this._isMap && this._keyPropertyName)
+					this._processKeyProperty(this._nestedProperties);
+
 				// create object factory
 				this._factory = this._createObjectFactory(propDef);
 			}
+		}
 
-		} else if (this._keyPropertyName) {
-			throw new common.X2UsageError(
-				'Record type ' + String(container.recordTypeName) +
-					' map property ' + container.nestedPath + propName +
-					' declares a key property but is not a nested object nor' +
-					' a reference.');
+		// validate target of the reference map key
+		if (this._isMap && (this._keyValueType === 'ref')) {
+			const keyRefTarget = this._keyRefTarget;
+			recordTypes._finalizers.push(function() {
+				if (!recordTypes.hasRecordType(keyRefTarget))
+					throw new common.X2UsageError(
+						'Record type ' + String(container.recordTypeName) +
+							' map property ' + container.nestedPath + propName +
+							' specifies key type as a reference that refers to' +
+							' unknown record type ' + keyRefTarget + '.');
+			});
 		}
 	}
 
@@ -494,7 +524,25 @@ class PropertyDescriptor {
 							' declares key property ' + this._keyPropertyName +
 							' that is not scalar, is a nested object, or is' +
 							' polymoprhic.');
+				if (this._keyValueType) {
+					if (
+						(keyPropDesc.scalarValueType !== this._keyValueType) ||
+							(keyPropDesc.isRef() && (
+								keyPropDesc.refTarget !== this._keyRefTarget))
+					) throw new common.X2UsageError(
+						'Record type ' + String(container.recordTypeName) +
+							' nested polymorphic object map property ' +
+							container.nestedPath + fullPropName +
+							' declares key property ' + this._keyPropertyName +
+							' that has different value type in different' +
+							' map value subtypes.');
+				} else {
+					this._keyValueType = keyPropDesc.scalarValueType;
+					if (keyPropDesc.isRef())
+						this._keyRefTarget = keyPropDesc.refTarget;
+				}
 			}
+
 		} else { // scalar
 
 			// may not have an id in the nested object
@@ -507,6 +555,55 @@ class PropertyDescriptor {
 
 		// return the nested container
 		return nestedProperties;
+	}
+
+	/**
+	 * Process key property name definition property and set key property value
+	 * type and reference target, if applicable, in the descriptor.
+	 *
+	 * @private
+	 * @param {module:x2node-records~PropertiesContainer} keyPropContainer The
+	 * container that should contain the key property.
+	 */
+	_processKeyProperty(keyPropContainer) {
+
+		// get the key property descriptor
+		const keyPropName = this._keyPropertyName;
+		if (!keyPropContainer.hasProperty(keyPropName))
+			throw new common.X2UsageError(
+				'Record type ' + String(this._container.recordTypeName) +
+					' map property ' + this._container.nestedPath + this._name +
+					' declares key property ' + keyPropName +
+					' that does not exist among the target object properties.');
+		const keyPropDesc = keyPropContainer.getPropertyDesc(keyPropName);
+
+		// validate the key property value type
+		if (!keyPropDesc.isScalar() || keyPropDesc.isPolymorph() ||
+			(keyPropDesc.scalarValueType === 'object'))
+			throw new common.X2UsageError(
+				'Record type ' + String(this._container.recordTypeName) +
+					' map property ' + this._container.nestedPath + this._name +
+					' declares key property ' + keyPropName +
+					' that is not scalar, is a nested object, or is' +
+					' polymoprhic.');
+
+		// set key value type in the map property descriptor
+		if (this._keyValueType === undefined) {
+			this._keyValueType = keyPropDesc.scalarValueType;
+			if (keyPropDesc.isRef())
+				this._keyRefTarget = keyPropDesc.refTarget;
+		} else { // called multiple times for polymorph map values
+			if ((keyPropDesc.scalarValueType !== this._keyValueType) ||
+				(keyPropDesc.isRef() && (
+					keyPropDesc.refTarget !== this._keyRefTarget)))
+				throw new common.X2UsageError(
+					'Record type ' + String(this._container.recordTypeName) +
+						' polymorphic map property ' +
+						this._container.nestedPath + this._name +
+						' declares key property ' + keyPropName +
+						' that has different value types in different' +
+						' map value subtypes.');
+		}
 	}
 
 	/**
@@ -582,6 +679,23 @@ class PropertyDescriptor {
 	 * @readonly
 	 */
 	isMap() { return this._isMap; }
+
+	/**
+	 * For a map property, scalar value type of the map key.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
+	get keyValueType() { return this._keyValueType; }
+
+	/**
+	 * If <code>keyValueType</code> is a reference, the reference target record
+	 * type name.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
+	get keyRefTarget() { return this._keyRefTarget; }
 
 	/**
 	 * For a nested object or reference map property, name of the property in the
