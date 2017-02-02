@@ -325,6 +325,10 @@ class PropertyDescriptor {
 		this._isArray = (!this._isScalar && (/^\s*\[/.test(propDef.valueType)));
 		this._isMap = (!this._isScalar && (/^\s*\{/.test(propDef.valueType)));
 
+		// determine if optional
+		this._optional = (
+			propDef.optional === undefined ? !this._isScalar : propDef.optional);
+
 		// determine if polymorph object
 		this._isPolymorph = /object\?/.test(propDef.valueType);
 		if (this._isPolymorph && !propDef.typePropertyName)
@@ -705,6 +709,14 @@ class PropertyDescriptor {
 	 * @readonly
 	 */
 	get keyPropertyName() { return this._keyPropertyName; }
+
+	/**
+	 * <code>true</code> if the property is optional.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get optional() { return this._optional; }
 
 	/**
 	 * <code>true</code> if the property is polymorphic (either nested object or

@@ -92,6 +92,8 @@ The example above defines three record types: "Account", "Product" and "Order". 
 
 At the minimum, every record type definition contains a `properties` property, which is an object that provides *property definitions*. The keys in the `properties` object are the property names and the values are objects that define the corresponding properties. Every property definition has a `valueType` property that defines the property value type. Structurally, a property can be *scalar*, which means it has a single value, an *array*, represented by a JSON array, or a *map*, represented by a JSON object.
 
+A property definition can be *optional* or *required*. When a property is optional it means a record does not have to have a value for that property. By default, scalar properties are required and array and map properties are optional (meaning they can be empty). To override the defaults, a property definition can have a Boolean property `optional` that specifies the optionality explicitely.
+
 A record type definition can also have a `factory` property, in which case it is a function that is used to create new instances of the record type. The function takes no arguments and the record type definition object is available to it as `this`. For example:
 
 ```javascript
@@ -645,6 +647,8 @@ This is the "leaf" descriptor object representing an individual record property.
 * `keyRefTarget` - Read-only string property that provides the target record type name if the `keyValueType` is a reference.
 
 * `keyPropertyName` - Read-only string property that for a nested object or reference map property contains the name of the property in the nested object or the referred record type that acts as the map key.
+
+* `optional` - Read-only property that is `true` if the property is optional and `false` if it is required.
 
 * `isPolymorph()` - Method that returns Boolean `true` if the property is a polymorphic nested object or a reference with multiple allowed target record types.
 
