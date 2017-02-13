@@ -17,6 +17,7 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
   * [References](#references)
   * [Arrays](#arrays)
   * [Maps](#maps)
+  * [Views](#views)
 * [The Descriptors](#the-descriptors)
   * [RecordTypesLibrary Class](#recordtypeslibrary-class)
   * [PropertiesContainer Class](#propertiescontainer-class)
@@ -582,6 +583,47 @@ Also, for nested object and reference maps, instead of using `keyValueType` defi
 }
 ```
 
+### Views
+
+It is possible to defined *view* properties. A view property inherits definition from another property in the same container, called *base* property and allow selectively override the definition properties. For example, a view property may represent a nested objects array base property as a map by overriding the value type and adding a key property in the definition:
+
+```javascript
+{
+	...
+	'Account': {
+		properties: {
+			...
+			'phones': {
+				valueType: '[object]',
+				properties: {
+					'id': {
+						valueType: 'number',
+						role: 'id'
+					},
+					'type': {
+						valueType: 'string'
+					},
+					'number': {
+						valueType: 'string'
+					}
+				}
+			},
+			'phonesByType': {
+				viewOf: 'phones',
+				valueType: '{object}',
+				keyPropertyName: 'type'
+			}
+			...
+		}
+	},
+	...
+}
+```
+
+Note how the `phonesByType` view property uses `viewOf` property in its definition torefer to the base property. Also note that one definition property that may not be overridden by a view is `properties`.
+
+Most of the time, the views are used to override extended definition properties used by other modules, such as scoped collection property filtering, ordering and aggregation. See [Extensibility](#extensibility).
+
 ## The Descriptors
 
 The `RecordTypesLibrary` class provides an API for working with the record types. The API converts the record type and property *definitions* provided to the module's `createRecordTypesLibrary` function to the corresponding record type and property *descriptors*, which are API objects providing properties and methods for the clients. The original definition object is always available through the descriptor.
@@ -633,6 +675,10 @@ This is the "leaf" descriptor object representing an individual record property.
 * `container` - Read-only reference to the `PropertiesContainer`, to which the property belongs.
 
 * `definition` - Read-only original property definition object.
+
+* `isView()` - Method that returns Boolean `true` if the property is a view of another property.
+
+* `viewOfDesc` - For a view property, read-only `PropertyDescriptor` of the base property.
 
 * `scalarValueType` - Read-only string property that describes the property value type. For a scalar property this is the type of the property value itself. For an array or map property, this is the type of the array or map elements. The following values are possible: "string", "number", "boolean", "datetime", "object" or "ref".
 
