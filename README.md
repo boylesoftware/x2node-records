@@ -636,7 +636,7 @@ This is the top class representing the whole record types library. The following
 
 * `hasRecordType(recordTypeName)` - Tell if the specified record type exists. Returns a Boolean `true` or `false`.
 
-* `addRecordType(recordTypeName, recordTypeDef)` - Add record type to the library. Adding a record type via this method does not modify the original type definitions object used to create the library. Using a `Symbol` as the type name allows other modules to extend the types library in a non-collisional way.
+* `addRecordType(recordTypeName, recordTypeDef)` - Add record type to the library. Adding a record type via this method does not modify the original type definitions object used to create the library. Using a `Symbol` as the type name allows other modules to extend the types library in a non-collisional way. The method returns `RecordTypeDescriptor` of the new record type.
 
 ### PropertiesContainer Class
 
