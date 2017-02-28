@@ -1,6 +1,6 @@
 # X2 Framework for Node.js | Record Types Library
 
-X2 Framework deals with the notion of *records*. Records are objects of a certain type, normally persisted in a database and identified by a unique id. In the code, records are represented by JSON objects. The collection of *record types* assembled into a *record types library* defines the data domain, with which the application operates. Record types define the structure of the records, record properties and their types, etc. A record type definition is a schema for the records, or, using the OOP analogy, record types are like classes and records are like instances or objects of those classes.
+X2 Framework deals with the notion of *records*. Records are objects of a certain type, normally persisted in a database and identified by a unique id. In the code, records are represented by JSON objects. The collection of *record types* assembled into a *record types library* defines the data domain, with which the application operates. Record types define the structure of the records, record properties and their value types, etc. A record type definition is a schema for the records, or, using the OOP analogy, record types are like classes and records are like instances or objects of those classes.
 
 ## Table of Contents
 
@@ -91,11 +91,11 @@ The example above defines three record types: "Account", "Product" and "Order". 
 
 ## Record Type Definitions
 
-At the minimum, every record type definition contains a `properties` property, which is an object that provides *property definitions*. The keys in the `properties` object are the property names and the values are objects that define the corresponding properties. Every property definition has a `valueType` property that defines the property value type. Structurally, a property can be *scalar*, which means it has a single value, an *array*, represented by a JSON array, or a *map*, represented by a JSON object.
+At the minimum, every record type definition contains a `properties` attribute, which is an object that provides *property definitions*. The keys in the `properties` object are the property names and the values are objects that define the corresponding properties. Every property definition has a `valueType` attribute that defines the property value type. Structurally, a property can be *scalar*, which means it has a single value, an *array*, represented by a JSON array, or a *map*, represented by a JSON object.
 
-A property definition can be *optional* or *required*. When a property is optional it means a record does not have to have a value for that property. By default, scalar properties are required and array and map properties are optional (meaning they can be empty). To override the defaults, a property definition can have a Boolean property `optional` that specifies the optionality explicitely.
+A property definition can be *optional* or *required*. When a property is optional it means a record does not have to have a value for that property. By default, scalar properties are required and array and map properties are optional (meaning they can be empty). To override the defaults, a property definition can have a Boolean attribute `optional` that specifies the optionality explicitely.
 
-A record type definition can also have a `factory` property, in which case it is a function that is used to create new instances of the record type. The function takes no arguments and the record type definition object is available to it as `this`. For example:
+A record type definition can also have a `factory` attribute, in which case it is a function that is used to create new instances of the record type. The function takes no arguments and the record type definition object is available to it as `this`. For example:
 
 ```javascript
 class Person {
@@ -240,7 +240,7 @@ Then in a record it can be:
 
 ### Record Id Property
 
-The records are intended to be persistent and every record can be identified by a unique id. Therefore, every record type definition must contain one property that is used as the record id. The record id property is marked by a `role` property in its definition with value "id". The value type of the property can be only "string" or "number". For example:
+The records are intended to be persistent and every record can be identified by a unique id. Therefore, every record type definition must contain one property that is used as the record id. The record id property is marked by a `role` attribute in its definition with value "id". The value type of the property can only be "string" or "number". For example:
 
 ```javascript
 {
@@ -315,7 +315,7 @@ Then in a record it could be:
 
 The `properties` object in the nested property definition follows the same rules as the one on the record type definition. Naturally, multiple nesting levels are allowed.
 
-As with the record types, a nested property definition may optionally contain a `factory` property providing a function used to create new instances of the nested object. The nested object property definition object is available to the custom factory function as `this`.
+As with the record types, a nested property definition may optionally contain a `factory` attribute providing a function used to create new instances of the nested object. The nested object property definition object is available to the custom factory function as `this`.
 
 ### Polymorphic Nested Objects
 
@@ -360,7 +360,7 @@ Sometimes it is necessary to have a nested object property that can have differe
 }
 ```
 
-The property is marked as polymorphic by the question mark in the value type property (the "object?"). Then, every polymorphic object property instance must have type property, which identifies its type. The type property name is defined by the definition's `typePropertyName` property. The properties for specific subtypes are defined in the `subtypes` map where the keys are the values for the type property.
+The property is marked as polymorphic by the question mark in the value type property (the "object?"). Then, every polymorphic object property instance must have type property, which identifies its type. The type property name is defined by the definition's `typePropertyName` attribute. The properties for specific subtypes are defined in the `subtypes` map where the keys are the values for the type property.
 
 Given the example definition above, an account record with a credit card payment info could look like:
 
@@ -386,7 +386,7 @@ And a record with an ACH transfer payment info:
 }
 ```
 
-When a custom factory function is required for a polymorphic object, the `factory` property is specified on each individual subtype definition.
+When a custom factory function is required for a polymorphic object, the `factory` attribute is specified on each individual subtype definition.
 
 ### References
 
@@ -521,7 +521,7 @@ Note, that there is one requirement for nested object arrays: the nested objects
 
 ### Maps
 
-Another type of collection properties are maps. In the records, maps are represented as nested objects. The difference between a nested object property and a map property is that a map does not have a fixed nested property definitions. To define a map property, the property value type is enclosed in curly braces and a `keyValueType` property is added to specify the map key value type. For example:
+Another type of collection properties are maps. In the records, maps are represented as nested objects. The difference between a nested object property and a map property is that a map does not have a fixed nested property definitions. To define a map property, the property value type is enclosed in curly braces and a `keyValueType` attribute is added to specify the map key value type. For example:
 
 ```javascript
 {
@@ -556,7 +556,7 @@ The `keyValueType` may be `string`, `number`, `boolean`, `datetime` or a single 
 
 Note, that for nested object maps, unlike nested object arrays, there is no requirement for the nested objects to have an id property since the objects are uniquely identified by the map key.
 
-Also, for nested object and reference maps, instead of using `keyValueType` definition property, the definition may include a `keyPropertyName` property that names the property of the nested object or the referred record type that acts as the map key. As with the `keyValueType`, the key property must be scalar, it may not be a nested object, and if it is a reference property it may not be polymorphic. For example:
+Also, for nested object and reference maps, instead of using `keyValueType` definition attribute, the definition may include a `keyPropertyName` attribute that names the property of the nested object or the referred record type that acts as the map key. As with the `keyValueType`, the key property must be scalar, it may not be a nested object, and if it is a reference property it may not be polymorphic. For example:
 
 ```javascript
 {
@@ -585,7 +585,7 @@ Also, for nested object and reference maps, instead of using `keyValueType` defi
 
 ### Views
 
-It is possible to defined *view* properties. A view property inherits definition from another property in the same container, called *base* property and allow selectively override the definition properties. For example, a view property may represent a nested objects array base property as a map by overriding the value type and adding a key property in the definition:
+It is possible to define *view* properties. A view property inherits definition from another property in the same container, called the *base* property, and allows to selectively override the definition attributes. For example, a view property may represent a nested objects array base property as a map by overriding the value type and adding a key property definition attribute:
 
 ```javascript
 {
@@ -620,9 +620,9 @@ It is possible to defined *view* properties. A view property inherits definition
 }
 ```
 
-Note how the `phonesByType` view property uses `viewOf` property in its definition torefer to the base property. Also note that one definition property that may not be overridden by a view is `properties`.
+Note how the `phonesByType` view property uses `viewOf` attribute in its definition torefer to the base property. Also note that one definition attribute that may not be overridden in a view is `properties`.
 
-Most of the time, the views are used to override extended definition properties used by other modules, such as scoped collection property filtering, ordering and aggregation. See [Extensibility](#extensibility).
+Most of the time, the views are used to override extended definition attributes used by other modules, such as scoped collection property filtering and ordering. See [Extensibility](#extensibility).
 
 ## The Descriptors
 
@@ -714,4 +714,4 @@ This is the "leaf" descriptor object representing an individual record property.
 
 ## Extensibility
 
-The record type and property definition objects do not restrict what properties they can have. The original definition objects are also always available to the client code through the `definition` property of the corresponding descriptor objects provided by the API. This allows extending the use of the record types library for other modules that can add their own properties to the definitions.
+The record type and property definition objects do not restrict what properties they can have. The original definition objects are also always available to the client code through the `definition` property of the corresponding descriptor objects provided by the API. This allows extending the use of the record types library for other modules that can add their own attributes to the definitions.
