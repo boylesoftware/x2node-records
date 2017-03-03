@@ -19,6 +19,7 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
   * [Maps](#maps)
   * [Views](#views)
 * [The Descriptors](#the-descriptors)
+  * [RecordTypesLibraryFactory Class](#recordtypeslibraryfactory-class)
   * [RecordTypesLibrary Class](#recordtypeslibrary-class)
   * [PropertiesContainer Class](#propertiescontainer-class)
   * [RecordTypeDescriptor Class](#recordtypedescriptor-class)
@@ -27,12 +28,12 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
 
 ## Usage
 
-The `x2node-records` module provides the essentials for the application record types library. The library is represented by an instance of `RecordTypesLibrary` class that can be created using `createRecordTypesLibrary` function exported by the module. A single library instance is usually created by the application once and then used throughout the runtime. When the library is created, it is provided with the *record type definitions* JSON object. For example:
+The `x2node-records` module provides the essentials for the application record types library. The library is represented by an instance of `RecordTypesLibrary` class. The instance is built by the factory (`RecordTypesLibraryFactory` class instance) that in turn can be created using `createLibraryFactory` function exported by the module. A single library instance is usually created by the application once in the beginning and then used throughout the runtime. When the library is built, it is provided with the *record type definitions* JSON object. Here is an example:
 
 ```javascript
 const records = require('x2node-records');
 
-const recordTypes = records.createRecordTypesLibrary({
+const recordTypes = records.createLibraryFactory().buildLibrary({
 	'Account': {
 		properties: {
 			'id': {
@@ -626,7 +627,15 @@ Most of the time, the views are used to override extended definition attributes 
 
 ## The Descriptors
 
-The `RecordTypesLibrary` class provides an API for working with the record types. The API converts the record type and property *definitions* provided to the module's `createRecordTypesLibrary` function to the corresponding record type and property *descriptors*, which are API objects providing properties and methods for the clients. The original definition object is always available through the descriptor.
+The `RecordTypesLibrary` class provides an API for working with the record types. The API converts the record type and property *definitions* provided to the factory's `buildLibrary` method to the corresponding record type and property *descriptors*, which are API objects providing properties and methods for the clients. The original definition object is always available through the descriptor as well.
+
+### RecordTypesLibraryFactory Class
+
+This the factory used to build the record types library. Before the library is built, additional extensions can be registered with the factory. See [Extensibility](#extensibility) below for the description of the extensions protocol. The factory exposes the following methods:
+
+* `addExtension(extension)` - Add a record types library extension. The method returns the factory instance.
+
+* `buildLibrary(recordTypeDefs)` - Build record types library using the provided definitions.
 
 ### RecordTypesLibrary Class
 

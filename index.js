@@ -5,19 +5,23 @@
  */
 'use strict';
 
-const RecordTypesLibrary = require('./lib/record-types-library.js');
+const RecordTypesLibraryFactory = require(
+	'./lib/record-types-library-factory.js');
 
 
 /**
- * Create record type library using the specified type definitions.
+ * Create record types library factory.
  *
- * @param {Object} recordTypeDefs Record type definitions.
- * @returns {module:x2node-records~RecordTypesLibrary} Record types library
- * object.
- * @throws {module:x2node-common.X2UsageError} If any record type definition is
- * invalid.
+ * @param {...module:x2node-records.Extension} extensions Extensions.
+ * @returns {module:x2node-records~RecordTypesLibraryFactory} Record types
+ * library factory.
  */
-exports.createRecordTypesLibrary = function(recordTypeDefs) {
+exports.createLibraryFactory = function() {
 
-	return new RecordTypesLibrary(recordTypeDefs);
+	const factory = new RecordTypesLibraryFactory();
+
+	for (let i = 0, len = arguments.length; i < len; i++)
+		factory.addExtension(arguments[i]);
+
+	return factory;
 };
