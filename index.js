@@ -12,7 +12,7 @@ const RecordTypesLibraryFactory = require(
 /**
  * Create record types library factory.
  *
- * @param {...module:x2node-records.Extension} extensions Extensions.
+ * @param {...module:x2node-records.Extension} [extensions] Extensions.
  * @returns {module:x2node-records~RecordTypesLibraryFactory} Record types
  * library factory.
  */
