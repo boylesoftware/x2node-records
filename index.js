@@ -10,13 +10,28 @@ const RecordTypesLibraryFactory = require(
 
 
 /**
- * Create record types library factory.
+ * Build record types library using the provided definitions. This is a shortcut
+ * function that allows creating record types libraries that do not use any
+ * extensions.
+ *
+ * @param {Object} recordTypeDefs Record type definitions.
+ * @returns {module:x2node-records~RecordTypesLibrary} Record types library.
+ * @throws {module:x2node-common.X2UsageError} If any record type definitions
+ * are found invalid.
+ */
+exports.buildLibrary = function(recordTypeDefs) {
+
+	return (new RecordTypesLibraryFactory()).buildLibrary(recordTypeDefs);
+};
+
+/**
+ * Create record types library builder with the specified extensions.
  *
  * @param {...module:x2node-records.Extension} [extensions] Extensions.
  * @returns {module:x2node-records~RecordTypesLibraryFactory} Record types
- * library factory.
+ * library builder.
  */
-exports.createLibraryFactory = function() {
+exports.with = function() {
 
 	const factory = new RecordTypesLibraryFactory();
 
