@@ -4,7 +4,7 @@
   "description": "Application data domain definition and tools.",
   "main": "index.js",
   "scripts": {
-    "test": "eslint **/*.js",
+    "test": "eslint . && mocha",
     "postversion": "git push"
   },
   "repository": {
@@ -24,6 +24,8 @@
     "x2node-common": "^1.1.0"
   },
   "devDependencies": {
-    "eslint": "^3.17.1"
+    "chai": "^3.5.0",
+    "eslint": "^3.17.1",
+    "mocha": "^3.2.0"
   }
 }
