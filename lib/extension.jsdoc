@@ -1,0 +1,53 @@
+/**
+ * Interface for record type library extensions. All interface methods are
+ * optional.
+ *
+ * @interface Extension
+ * @memberof module:x2node-records
+ */
+/**
+ * Extend record types library. The function is called on the extension right
+ * after the record types library instance is created and passed through the
+ * previously added extensions. This happens before the record types are added to
+ * the library. To perform work on the library after the record types are added,
+ * the extension can use
+ * [onLibraryComplete()]{@link module:x2node-records~LibraryConstructionContext#onLibraryComplete}
+ * method on the context.
+ *
+ * @function module:x2node-records.Extension#extendRecordTypesLibrary
+ * @param {module:x2node-records~LibraryConstructionContext} ctx Library
+ * construction context.
+ * @param {module:x2node-records~RecordTypesLibrary} recordTypes Record types
+ * library instance.
+ * @returns {module:x2node-records~RecordTypesLibrary} Extended record types
+ * library instance.
+ */
+/**
+ * Extend record type descriptor. The function is called on the extension right
+ * after the record type descriptor instance is created and passed through the
+ * previously added extensions. This happens before the properties are added to
+ * the descriptor. To perform work on the descriptor after the properties are
+ * added, the extension can use
+ * [onContainerComplete()]{@link module:x2node-records~LibraryConstructionContext#onContainerComplete}
+ * method on the context.
+ *
+ * @function module:x2node-records.Extension#extendPropertiesContainer
+ * @param {module:x2node-records~LibraryConstructionContext} ctx Library
+ * construction context.
+ * @param {module:x2node-records~PropertiesContainer} container Properties
+ * container.
+ * @returns {module:x2node-records~PropertiesContainer} Extended properties
+ * container.
+ */
+/**
+ * Extend property descriptor. The function receives the property descriptor
+ * after it is passed through the previously added extensions.
+ *
+ * @function module:x2node-records.Extension#extendPropertyDescriptor
+ * @param {module:x2node-records~LibraryConstructionContext} ctx Library
+ * construction context.
+ * @param {module:x2node-records~PropertyDescriptor} propDesc Property
+ * descriptor.
+ * @returns {module:x2node-records~PropertyDescriptor} Extended property
+ * descriptor.
+ */

@@ -2,6 +2,7 @@
  * Record types library module.
  *
  * @module x2node-records
+ * @requires module:x2node-common
  */
 'use strict';
 
