@@ -705,9 +705,9 @@ To use an extension it needs to be added to the records module via its `with` fu
 ```javascript
 const records = require('x2node-records');
 const rsparser = require('x2node-rsparser');
-const queries = require('x2node-queries');
+const dbos = require('x2node-dbos');
 
-const recordTypes = records.with(rsparser, queries).buildLibrary({
+const recordTypes = records.with(rsparser, dbos).buildLibrary({
 	...
 });
 ```
