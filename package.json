@@ -1,11 +1,11 @@
 {
   "name": "x2node-records",
-  "version": "2.0.0",
+  "version": "2.0.1-snapshot",
   "description": "Application data domain definition and tools.",
   "main": "index.js",
   "scripts": {
     "test": "eslint . && mocha",
-    "postversion": "git push"
+    "postversion": "git push --tags"
   },
   "repository": {
     "type": "git",
