@@ -5,12 +5,14 @@ const expect = require('chai').expect;
 const records = require('../index.js');
 
 
-const TEST_DEFS = {
-	'Record1': {
-		properties: {
-			'id': {
-				valueType: 'number',
-				role: 'id'
+const TEST_LIB = {
+	recordTypes: {
+		'Record1': {
+			properties: {
+				'id': {
+					valueType: 'number',
+					role: 'id'
+				}
 			}
 		}
 	}
@@ -29,7 +31,7 @@ describe('x2node-records', function() {
 
 	describe('RecordTypesLibrary', function() {
 
-		const recordTypes = records.buildLibrary(TEST_DEFS);
+		const recordTypes = records.buildLibrary(TEST_LIB);
 		it('should have Record1', function() {
 			expect(recordTypes.hasRecordType('Record1')).to.be.true;
 		});

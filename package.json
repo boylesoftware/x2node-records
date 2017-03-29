@@ -1,6 +1,6 @@
 {
   "name": "x2node-records",
-  "version": "2.0.1-snapshot",
+  "version": "2.1.0-snapshot",
   "description": "Application data domain definition and tools.",
   "main": "index.js",
   "scripts": {

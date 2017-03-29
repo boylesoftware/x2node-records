@@ -15,14 +15,14 @@ const RecordTypesLibraryFactory = require(
  * function that allows creating record types libraries that do not use any
  * extensions.
  *
- * @param {Object} recordTypeDefs Record type definitions.
+ * @param {Object} libraryDef Library definition object.
  * @returns {module:x2node-records~RecordTypesLibrary} Record types library.
  * @throws {module:x2node-common.X2UsageError} If any record type definitions
  * are found invalid.
  */
-exports.buildLibrary = function(recordTypeDefs) {
+exports.buildLibrary = function(libraryDef) {
 
-	return (new RecordTypesLibraryFactory()).buildLibrary(recordTypeDefs);
+	return (new RecordTypesLibraryFactory()).buildLibrary(libraryDef);
 };
 
 /**
@@ -41,3 +41,6 @@ exports.with = function() {
 
 	return factory;
 };
+
+// export the JSON pointer parser function
+exports.parseJSONPointer = require('./lib/property-pointer.js').parse;
