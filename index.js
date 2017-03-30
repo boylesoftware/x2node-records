@@ -41,6 +41,3 @@ exports.with = function() {
 
 	return factory;
 };
-
-// export the JSON pointer parser function
-exports.parseJSONPointer = require('./lib/property-pointer.js').parse;
