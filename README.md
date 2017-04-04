@@ -97,7 +97,9 @@ The example above defines three record types: "Account", "Product" and "Order". 
 
 At the minimum, every record type definition contains a `properties` attribute, which is an object that provides *property definitions*. The keys in the `properties` object are the property names and the values are objects that define the corresponding properties. Every property definition has a `valueType` attribute that defines the property value type. Structurally, a property can be *scalar*, which means it has a single value, an *array*, represented by a JSON array, or a *map*, represented by a JSON object. Array and map properties are sometimes called *collection* properties to distinguish them from the scalar properties.
 
-A property definition can be *optional* or *required*. When a property is optional it means a record does not have to have a value for that property. By default, scalar properties are required and array and map properties are optional (meaning they can be empty). To override the defaults, a property definition can have a Boolean attribute `optional` that explicitely specifies the optionality.
+A property can be *optional* or *required*. When a property is optional it means a record does not have to have a value for that property. By default, scalar properties are required and array and map properties are optional (meaning they can be empty or absent altogether). To override the defaults, a property definition can have a Boolean attribute `optional` that explicitly specifies the optionality.
+
+Also, a property can be *modifiable* or *read-only*. If a property is not modifiable it does not mean it is immutable. It only means that its value cannot be changed directly and explicitely. The property modifiability may be used by other modules to enforce or hint certain logic. By default, id and view properties are assumed to be read-only and all other properties are assumed to be modifiable. To override the defaults, a property definition can include a Boolean attribute `modifiable` that explicitly specifies the modifiability.
 
 A record type definition can also have a `factory` attribute, in which case it is a function that is used by the framework (and perhaps the application as well) whenever it needs to create a new instance of the record type. The function takes no arguments and the record type descriptor object (described later) is provided to it as `this`. For example:
 
@@ -675,6 +677,8 @@ This is the "leaf" descriptor object representing an individual record property.
 * `isMap()` - Returns Boolean `true` if the property is a map.
 
 * `optional` - Boolean `true` if the property is optional and `false` if it is required.
+
+* `isModifiable()` - Returns Boolean `true` if the property is modifiable.
 
 * `isId()` - Returns Boolean `true` if the property is an id property (the definition has `role` property set to "id").
 
