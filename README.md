@@ -382,8 +382,8 @@ Given the definition used above, an account record with a credit card payment in
 {
   "paymentInfo": {
     "type": "CREDIT_CARD",
-	"last4Digits": "3005",
-	"expDate": "2020-04"
+    "last4Digits": "3005",
+    "expDate": "2020-04"
   }
 }
 ```
@@ -394,15 +394,15 @@ And a record with an ACH transfer payment info:
 {
   "paymentInfo": {
     "type": "ACH_TRANSFER",
-	"accountType": "CHECKING",
-	"last4Digits": "8845"
+    "accountType": "CHECKING",
+    "last4Digits": "8845"
   }
 }
 ```
 
 When a custom factory function is required for a polymorphic object, the `factory` attribute is specified on each individual subtype definition.
 
-It is also possible to include a `properties` attribute in a polymorphic nested object property definition. In that case, the properties defined there are shared by all the subtypes.
+It is also possible to include a `properties` attribute in a polymorphic nested object definition. In that case, the properties defined there are shared by all of the subtypes.
 
 ### References
 
@@ -519,15 +519,15 @@ Then a record could look like:
   "scores": [ 3, 5.6, 10, -1, 0 ],
   "phones": [
     {
-	  "id": 1,
-	  "type": "Home",
-	  "number": "317-255-6677"
-	},
+      "id": 1,
+      "type": "Home",
+      "number": "317-255-6677"
+    },
     {
-	  "id": 2,
-	  "type": "Cell",
-	  "number": "689-567-0203"
-	}
+      "id": 2,
+      "type": "Cell",
+      "number": "689-567-0203"
+    }
   ],
   "orders": [ "Order#25684", "Order#25722" ]
 }
@@ -559,8 +559,8 @@ So, a student record could look like:
 {
   "scores": {
     "MATH101": 3.6,
-	"BIO201": 5.0,
-	"ENGLISH120": 4.8
+    "BIO201": 5.0,
+    "ENGLISH120": 4.8
   }
 }
 ```
