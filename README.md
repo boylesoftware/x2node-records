@@ -13,7 +13,7 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
 	* [The "datetime" Value Type](#the-datetime-value-type)
   * [Record Id Property](#record-id-property)
   * [Nested Objects](#nested-objects)
-  * [Polymorphic Nested Objects](#polymorphic-nested-objects)
+  * [Polymorphic Objects](#polymorphic-objects)
   * [References](#references)
   * [Arrays](#arrays)
   * [Maps](#maps)
@@ -320,9 +320,9 @@ Then in a record it could be:
 {
   "address": {
     "street": "42 W 24th St.",
-	"city": "New York",
-	"state": "NY",
-	"zip": "10010"
+    "city": "New York",
+    "state": "NY",
+    "zip": "10010"
   }
 }
 ```
@@ -374,7 +374,7 @@ Sometimes it is necessary to have a nested object property that can have differe
 }
 ```
 
-The property is understood as polymorphic by having the `subtypes` attribute. Every polymorphic object instance must have the *type property*, which identifies its type. The type property name is specified by the definition's `typePropertyName` attribute. The properties of specific subtypes are defined in the `subtypes` attribute where the keys are the values for the type property.
+The property is made polymorphic by having the `subtypes` attribute. Every polymorphic object instance must have the *type property*, which identifies its type. The type property name is specified by the definition's `typePropertyName` attribute. The properties of specific subtypes are defined in the `subtypes` attribute where the keys are the values for the type property.
 
 Given the definition used above, an account record with a credit card payment info could look like:
 
@@ -403,6 +403,54 @@ And a record with an ACH transfer payment info:
 When a custom factory function is required for a polymorphic object, the `factory` attribute is specified on each individual subtype definition.
 
 It is also possible to include a `properties` attribute in a polymorphic nested object definition. In that case, the properties defined there are shared by all of the subtypes.
+
+Also, a whole record type can be made polymoprhic by having a `subtypes` attribute. For example:
+
+```javascript
+{
+	...
+	'Event': {
+		typePropertyName: 'eventType',
+		properties: {
+			'id': {
+				valueType: 'number',
+				role: 'id'
+			},
+			'happenedOn': {
+				valueType: 'datetime'
+			}
+		},
+		subtypes: {
+			'OPENED': {
+				properties: {
+					'openedBy': {
+						valueType: 'string'
+					}
+				}
+			},
+			'CLOSED': {
+				properties: {
+					'reason': {
+						valueType: 'string'
+					}
+				}
+			}
+		}
+	},
+	...
+}
+```
+
+A "closed" *Event* record then could look like this:
+
+```json
+{
+  "id": 234532546,
+  "happenedOn": "2017-03-15T22:30:33.000Z",
+  "eventType": "CLOSED",
+  "reason": "REJECTED"
+}
+```
 
 ### References
 
@@ -624,6 +672,8 @@ This is the top class representing the whole record types library. The following
 
 Objects of this class describe anything that contains propeties. It matches the `properties` attribute in various definitions. A nested object property provides a properties container to describe the nested object's properties. The `RecordTypeDescriptor` class extends the `PropertiesContainer` class since every record type is a properties container.
 
+A container can also be *polymorphic*. There are two types of polymoprhic containers: container for a polymorphic nested object property and container for a polymorphic reference property. Any polymorphic property has such container associated with it. The container includes special pseudo-properties to describe specific subtypes. A polymorphic nested object (or polymorphic record type) container will have a pseudo-property for each subtype (in addition to the shared properties). Each such pseudo-property will be an optional scalar nested object property encapsulating the properties specific to the subtype. For a polymorphic reference container, the container will contain a property for each allowed referred record type. The property name is the referred record type name and the type is a scalar reference.
+
 A `PropertiesContainer` instance exposes the following properties and methods:
 
 * `recordTypeName` - The name of the record type, to which the container belongs. If the container is the record type descriptor itself, this is the record type name. If the container describes a nested object property, this is the name of the record type, to which the property belongs.
@@ -640,17 +690,27 @@ A `PropertiesContainer` instance exposes the following properties and methods:
 
 * `isRecordType()` - Tells if the container is a `RecordTypeDescriptor`. Returns Boolean `true` or `false`. Another way to test if a container is a record type descriptor is to check its `nestedPath` property, which is always an empty string for a record type descriptor.
 
+* `isPolymorphObject()` - Returns `true` for a polymorphic object container. A polymorphic object container will have `subtypes` and `typePropertyName` descriptor properties as well. Plus some of the property descriptors in the container will have their `isSubtype()` method return `true`.
+
+* `isPolymorphRef()` - Returns `true` for a polymorphic reference container. A polymorphic reference container will also have `subtypes` descriptor property. Plus all of the property descriptors in the container will have their `isSubtype()` method return `true`.
+
+* `isPolymorph()` - Returns `true` for a polymorphic container. Equivalent to `isPolymorphObject() || isPolymorphRef()`.
+
+* `typePropertyName` - For a polymoprhic object container, name of the property used in the record instances described by the container to indicate the record instance subtype. Note, that the property does not have a descriptor in the container and is not listed in the `allPropertyNames`.
+
+* `subtypes` - For a polymorphic object container, the list of all subtype names. For a polymoprhic reference container, the list of names of all allowed referred record types.
+
 * `definition` - The definition object used to create the container. For a record type, this is the record type definition object. For a nested object property, this is the nested object property definition object.
 
 * `parentContainer` - For a nested object property this is a reference to the parent `PropertiesContainer`. For a record type descriptor, always `null`.
+
+* `newRecord()` - Creates new, empty record instance for this container. If factory function was provided in the container definition, it is used. Otherwise, a simple `new Object()` is returned.
 
 ### RecordTypeDescriptor Class
 
 The `RecordTypeDescriptor` extends the `PropertiesContainer` class and provides the top descriptor of a record type. In addition to the properties and methods exposed by `PropertiesContainer`, the class also exposes the following properties and methods:
 
 * `name` - Record type name. This is the same as what's exposed by the `PropertyContainer`'s `recordTypeName` property.
-
-* `newRecord()` - Create and return a new instance of the record type. If the record type definition has a `factory` property, the function associated with the property is invoked and its result is returned. Otherwise, a simple `new Object()` is used.
 
 ### PropertyDescriptor Class
 
@@ -678,29 +738,23 @@ This is the "leaf" descriptor object representing an individual record property.
 
 * `optional` - Boolean `true` if the property is optional and `false` if it is required.
 
-* `isModifiable()` - Returns Boolean `true` if the property is modifiable.
+* `modifiable` - Boolean `true` if the property is modifiable.
 
 * `isId()` - Returns Boolean `true` if the property is an id property (the definition has `role` property set to "id").
 
-* `isPolymorphObject()` - Returns Boolean `true` if the property is a polymorphic nested object.
+* `isPolymorphObject()` - Returns Boolean `true` if the property is a polymorphic nested object. A shortcut for `nestedProperties.isPolymorphObject()`.
 
-* `isPolymorphRef()` - Returns Boolean `true` if the property is a reference with multiple targets. Note, that the `scalarValueType` in this case is `object`, not `ref` (see `nestedProperties` property description below).
+* `isPolymorphRef()` - Returns Boolean `true` if the property is a reference with multiple targets. Note, that the `scalarValueType` in this case is `object`, not `ref` (see `nestedProperties` property description below). This is a shortcut for `nestedProperties.isPolymorphRef()`.
 
-* `isPolymorph()` - Returns Boolean `true` if the property is a polymorphic nested object or a reference with multiple targets (equivalent of `isPolymorphObject() || isPolymorphRef()`).
-
-* `typePropertyName` - For a polymorphic nested object property, name of the property used as the concrete type discriminator. The same is made available on the subtype pseudo-properties (those that have `isSubtype()` return `true`).
-
-* `isSubtype()` - Returns Boolean `true` if the property is a pseudo-property representing a subtype in a polymorphic nested object or property container. Such property can be either a nested object or a reference property.
+* `isSubtype()` - Returns Boolean `true` if the property is a pseudo-property representing a subtype in a polymorphic container. Such property itself can be either a nested object or a reference property.
 
 * `isRef()` - Returns Boolean `true` if the property is a **non-polymorphic** reference (that is the `scalarValueType` property is "ref").
 
 * `refTarget` - Name of the referred record type for a non-polymorphic reference property.
 
+* `refTargets` - For a polymorphic reference property, array of names of all allowed referred record types. This is a shortcut for `nestedProperties.subtypes`.
+
 * `nestedProperties` - For a nested object property, `PropertiesContainer` of the nested object's properties. For a non-polymorphic reference property, the referred `RecordTypeDescriptor`. For a polymorphic nested object, a `PropertiesContainer` with pseudo-properties that use the subtype names and describe each subtype as a nested object property. The container also includes the shared properties defined in the `properties` attribute, if any. For a polymorphic reference property, also a `PropertiesContainer` with pseudo-properties, each using the target record type name as its name and having a non-polymorphic reference type.
-
-* `subtypes` - For a polymorphic nested object property, an array of all subtype names. For a polymorphic reference property, an array of names of possible target record types.
-
-* `newObject()` - Method used to create instances of the nested object for a nested object property.
 
 ## Extensibility
 
