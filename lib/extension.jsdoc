@@ -1,9 +1,16 @@
 /**
- * Interface for record type library extensions. All interface methods are
- * optional.
+ * Interface for record type library extensions. All interface methods and
+ * properties are optional.
  *
  * @interface Extension
  * @memberof module:x2node-records
+ */
+/**
+ * List of extensions that need to be added to the library before this one. The
+ * library makes sure that no extension is added more than once.
+ *
+ * @member {Array.<module:x2node-records.Extension>} module:x2node-records.Extension#requiredExtensions
+ * @readonly
  */
 /**
  * Extend record types library. The function is called on the extension right

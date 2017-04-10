@@ -36,8 +36,14 @@ exports.with = function() {
 
 	const factory = new RecordTypesLibraryFactory();
 
-	for (let i = 0, len = arguments.length; i < len; i++)
-		factory.addExtension(arguments[i]);
+	for (let i = 0, len = arguments.length; i < len; i++) {
+		const ext = arguments[i];
+		if (ext.requiredExtensions) {
+			for (let depExt of ext.requiredExtensions)
+				factory.addExtension(depExt);
+		}
+		factory.addExtension(ext);
+	}
 
 	return factory;
 };
