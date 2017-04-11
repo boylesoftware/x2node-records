@@ -13,7 +13,7 @@ X2 Framework deals with the notion of *records*. Records are objects of a certai
 	* [The "datetime" Value Type](#the-datetime-value-type)
   * [Record Id Property](#record-id-property)
   * [Nested Objects](#nested-objects)
-  * [Polymorphic Objects](#polymorphic-objects)
+  * [Polymorphic Nested Objects](#polymorphic-nested-objects)
   * [References](#references)
   * [Arrays](#arrays)
   * [Maps](#maps)
@@ -374,7 +374,7 @@ Sometimes it is necessary to have a nested object property that can have differe
 }
 ```
 
-The property is made polymorphic by having the `subtypes` attribute. Every polymorphic object instance must have the *type property*, which identifies its type. The type property name is specified by the definition's `typePropertyName` attribute. The properties of specific subtypes are defined in the `subtypes` attribute where the keys are the values for the type property.
+The property is made polymorphic by having the `subtypes` attribute. Every polymorphic object instance must have the *type property*, which identifies its type. The type property name is specified by the definition's `typePropertyName` required attribute. The properties of specific subtypes are defined in the `subtypes` attribute where the keys are the values for the type property.
 
 Given the definition used above, an account record with a credit card payment info could look like:
 
@@ -581,6 +581,25 @@ Then a record could look like:
 }
 ```
 
+By default, the framework assumes that values in a non-object array are unique. This is reported via the array property's descriptor discussed below and may be used by other modules and the application to determine the logic of how they work with the array. To override the default, a `allowDuplicates` attribute can be specified on the array property definition:
+
+```javascript
+{
+	...
+	'Account': {
+		properties: {
+			...
+			'scores': {
+				valueType: 'number[]',
+				allowDuplicates: true
+			},
+			...
+		}
+	},
+	...
+}
+```
+
 ### Maps
 
 Another type of collection properties are maps. In the records, maps are represented as nested objects. The difference between a nested object property and a map property is that a map does not have a fixed set of nested property definitions. To define a map property, the property value type is suffixed with a curly braces pair. For example:
@@ -696,7 +715,7 @@ A `PropertiesContainer` instance exposes the following properties and methods:
 
 * `isPolymorph()` - Returns `true` for a polymorphic container. Equivalent to `isPolymorphObject() || isPolymorphRef()`.
 
-* `typePropertyName` - For a polymoprhic object container, name of the property used in the record instances described by the container to indicate the record instance subtype. Note, that the property does not have a descriptor in the container and is not listed in the `allPropertyNames`.
+* `typePropertyName` - For a polymoprhic object container, name of the property used in the record instances described by the container to indicate the record instance subtype. Note, that the property has a descriptor accessible via the container's `hasProperty()` and `getPropertyDesc()` methods, but is "hidden" and is not listed in the `allPropertyNames`. The descriptor of a type property is always a scalar, non-modifiable, required "string" and its `isPolymorphObjectType()` method returns `true`.
 
 * `subtypes` - For a polymorphic object container, the list of all subtype names. For a polymoprhic reference container, the list of names of all allowed referred record types.
 
@@ -740,6 +759,8 @@ This is the "leaf" descriptor object representing an individual record property.
 
 * `modifiable` - Boolean `true` if the property is modifiable.
 
+* `allowDuplicates` - For a non-object array property this is Boolean `true` if duplicate values are allowed.
+
 * `isId()` - Returns Boolean `true` if the property is an id property (the definition has `role` property set to "id").
 
 * `isPolymorphObject()` - Returns Boolean `true` if the property is a polymorphic nested object. A shortcut for `nestedProperties.isPolymorphObject()`.
@@ -747,6 +768,8 @@ This is the "leaf" descriptor object representing an individual record property.
 * `isPolymorphRef()` - Returns Boolean `true` if the property is a reference with multiple targets. Note, that the `scalarValueType` in this case is `object`, not `ref` (see `nestedProperties` property description below). This is a shortcut for `nestedProperties.isPolymorphRef()`.
 
 * `isSubtype()` - Returns Boolean `true` if the property is a pseudo-property representing a subtype in a polymorphic container. Such property itself can be either a nested object or a reference property.
+
+* `isPolymorphObjectType()` - Returns `true` if the descriptor if for a polymorphic object type "hidden" property.
 
 * `isRef()` - Returns Boolean `true` if the property is a **non-polymorphic** reference (that is the `scalarValueType` property is "ref").
 
