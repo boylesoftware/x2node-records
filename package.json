@@ -1,7 +1,12 @@
 {
   "name": "x2node-records",
-  "version": "2.1.0",
+  "version": "2.1.1-alpha.0",
   "description": "Application data domain definition and tools.",
+  "keywords": [
+    "schema",
+    "x2node",
+    "nodejs"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "eslint . && mocha",
@@ -22,7 +27,7 @@
     "node": ">=4.3.2"
   },
   "dependencies": {
-    "x2node-common": "^1.1.0"
+    "x2node-common": "^1.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
