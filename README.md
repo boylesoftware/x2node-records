@@ -687,6 +687,8 @@ This is the top class representing the whole record types library. The following
 
 * `definition` - The original library definition object passed to the `buildLibrary` function.
 
+* `refToId(recordTypeName, ref)` - Convert reference `ref` to a record of the specified by `recordTypeName` record type to the record id.
+
 ### PropertiesContainer Class
 
 Objects of this class describe anything that contains propeties. It matches the `properties` attribute in various definitions. A nested object property provides a properties container to describe the nested object's properties. The `RecordTypeDescriptor` class extends the `PropertiesContainer` class since every record type is a properties container.
@@ -730,6 +732,8 @@ A `PropertiesContainer` instance exposes the following properties and methods:
 The `RecordTypeDescriptor` extends the `PropertiesContainer` class and provides the top descriptor of a record type. In addition to the properties and methods exposed by `PropertiesContainer`, the class also exposes the following properties and methods:
 
 * `name` - Record type name. This is the same as what's exposed by the `PropertyContainer`'s `recordTypeName` property.
+
+* `refToId(ref)` - Convert reference `ref` to a record of ththis record type to the record id.
 
 ### PropertyDescriptor Class
 
