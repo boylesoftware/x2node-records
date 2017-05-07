@@ -27,7 +27,7 @@
     "node": ">=4.3.2"
   },
   "dependencies": {
-    "x2node-common": "^1.2.1"
+    "x2node-common": "^1.2.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
