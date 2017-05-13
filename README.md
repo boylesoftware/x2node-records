@@ -2,6 +2,8 @@
 
 X2 Framework deals with the notion of *records*. Records are objects of a certain type, normally persisted in a database and identified by a unique id. In the code, records are represented by JSON objects. The collection of *record types* assembled into a *record types library* defines the data domain, with which the application operates. Record types define the structure of the records, record properties and their value types, relationships between different record types in the library, etc. A record type definition is a schema for the records of that type, or, using the OOP analogy, record types are like classes and records are like instances or objects of those classes.
 
+See module's [API Reference Documentation](https://boylesoftware.github.io/x2node-api-reference/module-x2node-records.html).
+
 ## Table of Contents
 
 * [Usage](#usage)
