@@ -10,9 +10,9 @@ See module's [API Reference Documentation](https://boylesoftware.github.io/x2nod
 * [Record Type Definitions](#record-type-definitions)
   * [Simple Value Types](#simple-value-types)
     * [The "string" Value Type](#the-string-value-type)
-	* [The "number" Value Type](#the-number-value-type)
-	* [The "boolean" Value Type](#the-boolean-value-type)
-	* [The "datetime" Value Type](#the-datetime-value-type)
+    * [The "number" Value Type](#the-number-value-type)
+    * [The "boolean" Value Type](#the-boolean-value-type)
+    * [The "datetime" Value Type](#the-datetime-value-type)
   * [Record Id Property](#record-id-property)
   * [Nested Objects](#nested-objects)
   * [Polymorphic Nested Objects](#polymorphic-nested-objects)
@@ -37,59 +37,59 @@ The `x2node-records` module provides the essentials for the application record t
 const records = require('x2node-records');
 
 const recordTypes = records.buildLibrary({
-	recordTypes: {
-		'Account': {
-			properties: {
-				'id': {
-					valueType: 'number',
-					role: 'id'
-				},
-				'name': {
-					valueType: 'string'
-				},
-				'orderRefs': {
-					valueType: 'ref(Order)[]'
-				}
-			}
-		},
-		'Product': {
-			properties: {
-				'id': {
-					valueType: 'number',
-					role: 'id'
-				},
-				'name': {
-					valueType: 'string'
-				}
-			}
-		},
-		'Order': {
-			properties: {
-				'id': {
-					valueType: 'number',
-					role: 'id'
-				},
-				'accountRef': {
-					valueType: 'ref(Account)'
-				},
-				'items': {
-					valueType: 'object[]',
-					properties: {
-						'id': {
-							valueType: 'number',
-							role: 'id'
-						},
-						'productRef': {
-							valueType: 'ref(Product)'
-						},
-						'quantity': {
-							valueType: 'number'
-						}
-					}
-				}
-			}
-		}
-	}
+    recordTypes: {
+        'Account': {
+            properties: {
+                'id': {
+                    valueType: 'number',
+                    role: 'id'
+                },
+                'name': {
+                    valueType: 'string'
+                },
+                'orderRefs': {
+                    valueType: 'ref(Order)[]'
+                }
+            }
+        },
+        'Product': {
+            properties: {
+                'id': {
+                    valueType: 'number',
+                    role: 'id'
+                },
+                'name': {
+                    valueType: 'string'
+                }
+            }
+        },
+        'Order': {
+            properties: {
+                'id': {
+                    valueType: 'number',
+                    role: 'id'
+                },
+                'accountRef': {
+                    valueType: 'ref(Account)'
+                },
+                'items': {
+                    valueType: 'object[]',
+                    properties: {
+                        'id': {
+                            valueType: 'number',
+                            role: 'id'
+                        },
+                        'productRef': {
+                            valueType: 'ref(Product)'
+                        },
+                        'quantity': {
+                            valueType: 'number'
+                        }
+                    }
+                }
+            }
+        }
+    }
 });
 ```
 
@@ -107,18 +107,18 @@ A record type definition can also have a `factory` attribute, in which case it i
 
 ```javascript
 class Person {
-	...
+    ...
 }
 
 const recordTypes = records.buildLibrary({
-	recordTypes: {
-		'Person': {
-			properties: {
-				...
-			},
-			factory: function() { return new Person(); }
-		}
-	}
+    recordTypes: {
+        'Person': {
+            properties: {
+                ...
+            },
+            factory: function() { return new Person(); }
+        }
+    }
 });
 ```
 
@@ -134,20 +134,20 @@ This is a single JSON string value. For example:
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			...
-			'firstName': {
-				valueType: 'string'
-			},
-			'lastName': {
-				valueType: 'string'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            ...
+            'firstName': {
+                valueType: 'string'
+            },
+            'lastName': {
+                valueType: 'string'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -166,20 +166,20 @@ This is a single JSON number value, including integer, floating point, etc. For 
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			...
-			'worth': {
-				valueType: 'number'
-			},
-			'numShipsServed': {
-				valueType: 'number'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            ...
+            'worth': {
+                valueType: 'number'
+            },
+            'numShipsServed': {
+                valueType: 'number'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -198,17 +198,17 @@ A single Boolean value:
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			...
-			'availableForHire': {
-				valueType: 'boolean'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            ...
+            'availableForHire': {
+                valueType: 'boolean'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -226,17 +226,17 @@ Represents a single date and time value. In JSON it is represented by a string i
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			...
-			'boardedOn': {
-				valueType: 'datetime'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            ...
+            'boardedOn': {
+                valueType: 'datetime'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -254,17 +254,17 @@ The records are intended to be persistent and every record can be identified by 
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			'id': {
-				valueType: 'number',
-				role: 'id'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            'id': {
+                valueType: 'number',
+                role: 'id'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -284,35 +284,35 @@ A property can be a nested object. For example:
 
 ```javascript
 {
-	...
-	'Person': {
-		properties: {
-			...
-			'address': {
-				valueType: 'object',
-				properties: {
-					'street': {
-						valueType: 'string'
-					},
-					'unit': {
-						valueType: 'string',
-						optional: true
-					},
-					'city': {
-						valueType: 'string'
-					},
-					'state': {
-						valueType: 'string'
-					},
-					'zip': {
-						valueType: 'string'
-					}
-				}
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Person': {
+        properties: {
+            ...
+            'address': {
+                valueType: 'object',
+                properties: {
+                    'street': {
+                        valueType: 'string'
+                    },
+                    'unit': {
+                        valueType: 'string',
+                        optional: true
+                    },
+                    'city': {
+                        valueType: 'string'
+                    },
+                    'state': {
+                        valueType: 'string'
+                    },
+                    'zip': {
+                        valueType: 'string'
+                    }
+                }
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -339,40 +339,40 @@ Sometimes it is necessary to have a nested object property that can have differe
 
 ```javascript
 {
-	...
-	'Account': {
-		properties: {
-			...
-			'paymentInfo': {
-				valueType: 'object',
-				typePropertyName: 'type',
-				subtypes: {
-					'CREDIT_CARD': {
-						properties: {
-							'last4Digits': {
-								valueType: 'string'
-							},
-							'expDate': {
-								valueType: 'string'
-							}
-						}
-					},
-					'ACH_TRANSFER': {
-						properties: {
-							'accountType': {
-								valueType: 'string'
-							},
-							'last4Digits': {
-								valueType: 'string'
-							}
-						}
-					}
-				}
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Account': {
+        properties: {
+            ...
+            'paymentInfo': {
+                valueType: 'object',
+                typePropertyName: 'type',
+                subtypes: {
+                    'CREDIT_CARD': {
+                        properties: {
+                            'last4Digits': {
+                                valueType: 'string'
+                            },
+                            'expDate': {
+                                valueType: 'string'
+                            }
+                        }
+                    },
+                    'ACH_TRANSFER': {
+                        properties: {
+                            'accountType': {
+                                valueType: 'string'
+                            },
+                            'last4Digits': {
+                                valueType: 'string'
+                            }
+                        }
+                    }
+                }
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -410,36 +410,36 @@ Also, a whole record type can be made polymoprhic by having a `subtypes` attribu
 
 ```javascript
 {
-	...
-	'Event': {
-		typePropertyName: 'eventType',
-		properties: {
-			'id': {
-				valueType: 'number',
-				role: 'id'
-			},
-			'happenedOn': {
-				valueType: 'datetime'
-			}
-		},
-		subtypes: {
-			'OPENED': {
-				properties: {
-					'openedBy': {
-						valueType: 'string'
-					}
-				}
-			},
-			'CLOSED': {
-				properties: {
-					'reason': {
-						valueType: 'string'
-					}
-				}
-			}
-		}
-	},
-	...
+    ...
+    'Event': {
+        typePropertyName: 'eventType',
+        properties: {
+            'id': {
+                valueType: 'number',
+                role: 'id'
+            },
+            'happenedOn': {
+                valueType: 'datetime'
+            }
+        },
+        subtypes: {
+            'OPENED': {
+                properties: {
+                    'openedBy': {
+                        valueType: 'string'
+                    }
+                }
+            },
+            'CLOSED': {
+                properties: {
+                    'reason': {
+                        valueType: 'string'
+                    }
+                }
+            }
+        }
+    },
+    ...
 }
 ```
 
@@ -460,30 +460,30 @@ Often, different record types in the application's data domain are related and c
 
 ```javascript
 {
-	...
-	'Order': {
-		properties: {
-			'id': {
-				valueType: 'number',
-				role: 'id'
-			},
-			...
-			'productRef': {
-				valueType: 'ref(Product)'
-			},
-			...
-		}
-	},
-	'Product': {
-		properties: {
-			'id': {
-				valueType: 'number',
-				role: 'id'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Order': {
+        properties: {
+            'id': {
+                valueType: 'number',
+                role: 'id'
+            },
+            ...
+            'productRef': {
+                valueType: 'ref(Product)'
+            },
+            ...
+        }
+    },
+    'Product': {
+        properties: {
+            'id': {
+                valueType: 'number',
+                role: 'id'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -502,23 +502,23 @@ References can also be polymorphic allowing a property to refer to records of di
 
 ```javascript
 {
-	...
-	'Account': {
-		properties: {
-			...
-			'lastInterestedInRef': {
-				valueType: 'ref(Product|Service)'
-			},
-			...
-		}
-	},
-	'Product': {
-		...
-	},
-	'Service': {
-		...
-	},
-	...
+    ...
+    'Account': {
+        properties: {
+            ...
+            'lastInterestedInRef': {
+                valueType: 'ref(Product|Service)'
+            },
+            ...
+        }
+    },
+    'Product': {
+        ...
+    },
+    'Service': {
+        ...
+    },
+    ...
 }
 ```
 
@@ -530,35 +530,35 @@ So far, we've seen only scalar properties, which allow only a single value (even
 
 ```javascript
 {
-	...
-	'Account': {
-		properties: {
-			...
-			'scores': {
-				valueType: 'number[]'
-			},
-			'phones': {
-				valueType: 'object[]',
-				properties: {
-					'id': {
-						valueType: 'number',
-						role: 'id'
-					},
-					'type': {
-						valueType: 'string'
-					},
-					'number': {
-						valueType: 'string'
-					}
-				}
-			},
-			'orders': {
-				valueType: 'ref(Order)[]'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Account': {
+        properties: {
+            ...
+            'scores': {
+                valueType: 'number[]'
+            },
+            'phones': {
+                valueType: 'object[]',
+                properties: {
+                    'id': {
+                        valueType: 'number',
+                        role: 'id'
+                    },
+                    'type': {
+                        valueType: 'string'
+                    },
+                    'number': {
+                        valueType: 'string'
+                    }
+                }
+            },
+            'orders': {
+                valueType: 'ref(Order)[]'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -587,18 +587,18 @@ By default, the framework assumes that values in a non-object array are unique. 
 
 ```javascript
 {
-	...
-	'Account': {
-		properties: {
-			...
-			'scores': {
-				valueType: 'number[]',
-				allowDuplicates: true
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Account': {
+        properties: {
+            ...
+            'scores': {
+                valueType: 'number[]',
+                allowDuplicates: true
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -608,17 +608,17 @@ Another type of collection properties are maps. In the records, maps are represe
 
 ```javascript
 {
-	...
-	'Student': {
-		properties: {
-			...
-			'scores': {
-				valueType: 'number{}'
-			},
-			...
-		}
-	},
-	...
+    ...
+    'Student': {
+        properties: {
+            ...
+            'scores': {
+                valueType: 'number{}'
+            },
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -640,34 +640,34 @@ It is possible to define *view* properties. A view property inherits definition 
 
 ```javascript
 {
-	...
-	'Account': {
-		properties: {
-			...
-			'phones': {
-				valueType: 'object[]',
-				properties: {
-					'id': {
-						valueType: 'number',
-						role: 'id'
-					},
-					'type': {
-						valueType: 'string'
-					},
-					'number': {
-						valueType: 'string'
-					}
-				}
-			},
-			'phonesByType': {
-				viewOf: 'phones',
-				valueType: 'object{}',
-				keyPropertyName: 'type'
-			}
-			...
-		}
-	},
-	...
+    ...
+    'Account': {
+        properties: {
+            ...
+            'phones': {
+                valueType: 'object[]',
+                properties: {
+                    'id': {
+                        valueType: 'number',
+                        role: 'id'
+                    },
+                    'type': {
+                        valueType: 'string'
+                    },
+                    'number': {
+                        valueType: 'string'
+                    }
+                }
+            },
+            'phonesByType': {
+                viewOf: 'phones',
+                valueType: 'object{}',
+                keyPropertyName: 'type'
+            }
+            ...
+        }
+    },
+    ...
 }
 ```
 
@@ -799,7 +799,7 @@ const rsparser = require('x2node-rsparser');
 const dbos = require('x2node-dbos');
 
 const recordTypes = records.with(rsparser, dbos).buildLibrary({
-	...
+    ...
 });
 ```
 
