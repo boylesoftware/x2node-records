@@ -1,6 +1,6 @@
 {
   "name": "x2node-records",
-  "version": "2.2.6",
+  "version": "2.3.0-alpha.0",
   "description": "Application data domain definition and tools.",
   "keywords": [
     "schema",
