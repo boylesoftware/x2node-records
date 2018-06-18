@@ -689,6 +689,8 @@ This is the top class representing the whole record types library. The following
 
 * `definition` - The original library definition object passed to the `buildLibrary` function.
 
+* `definedRecordTypeNames` - Array of strings containing names of all record types from the original library definition provided to the factory. (The callers should not modify the array!)
+
 * `refToId(recordTypeName, ref)` - Convert reference `ref` to a record of the specified by `recordTypeName` record type to the record id.
 
 ### PropertiesContainer Class
